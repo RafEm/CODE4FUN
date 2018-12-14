@@ -1,0 +1,92 @@
+﻿<html>
+<head>
+<title>JS-speeder</title>
+</head>
+<body style='background: #ccc'>
+<div id="gridDiv" style='background:#222;margin:-5px auto 0 auto;border-left: 2px solid black;border-right: 2px solid black;height:103%;width:40%;font-size:45px; font-family:tahoma; line-height:51px;letter-spacing:7px'>
+<script type="text/javascript">
+
+function getUrlVars() {
+var vars = {};
+var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+vars[key] = value;
+});
+return vars;
+}
+function sleep(delay) {
+var start = new Date().getTime();
+while (new Date().getTime() < start + delay);
+}
+var gridDiv=document.getElementById('gridDiv');
+var gridWall = 12;
+var gridSize = gridWall * gridWall;
+gridSize--;
+var initShipPos = gridSize - gridWall / 2;
+var lastRowStart = gridSize - gridWall;
+var topRow =gridWall;
+var display = "";
+var escape = "";
+var colision = "";
+var shipPos = getUrlVars()["shipPosition"];
+var enemyPos = getUrlVars()["enemyPos"];
+var enemy2Pos = getUrlVars()["enemy2Pos"];
+if(shipPos == "undefined"){
+var shipPos = Math.ceil(initShipPos);
+}
+if((enemyPos == "NaN") || (enemyPos == "undefined")){
+enemyPos = Math.floor(Math.random() * topRow + 1);
+}else{
+enemyPos = Number(enemyPos);
+enemyPos = gridWall + enemyPos;
+enemyPos--;
+}
+if((enemy2Pos == "NaN") || (enemy2Pos == "undefined")){
+if(enemyPos > 34){
+enemy2Pos = Math.floor(Math.random() * topRow + 1);
+}
+}else{
+enemy2Pos = Number(enemy2Pos);
+enemy2Pos = gridWall + enemy2Pos;
+enemy2Pos--;
+}
+
+function drawGrid(){
+var gridLine = 1;
+for(var l=1;l <= gridSize; l++){
+var dsp="<span style='color:#222'>@</span>";
+if(l == enemyPos){dsp="<span style='color:green'>@</span>";}
+if(l == enemy2Pos){dsp="<span style='color:red'>@</span>";}
+function checkColision(){
+colisionDetect =  6 * gridWall - 6;
+var colisionCourse = shipPos - colisionDetect;
+if((enemyPos == colisionCourse) || (enemy2Pos == colisionCourse)){
+var colision = "true"; 
+var randDecision = Math.floor(Math.random() * 2);
+if(randDecision == 0){escape = "left";}else{escape = "right";}
+}
+if(colision == "true"){
+if(shipPos == lastRowStart){escape = "right";}
+if(shipPos == gridSize){escape = "left";}
+if(escape == "left"){shipPos--;}else{shipPos++;}
+checkColision();
+}
+}
+checkColision();
+if(l == shipPos){dsp="<span style='color:white'><b>^</b></span>";}
+if(gridLine == gridWall){ display += "<br />";gridLine =  1;}
+gridLine++;
+if(enemyPos > gridSize){enemyPos = "undefined"; }
+if(enemy2Pos > gridSize){enemy2Pos = "undefined"; }
+display += dsp;
+}
+gridDiv.innerHTML = display;
+
+sleep(30);
+document.location.replace("JS-speeder.html?shipPosition=" + shipPos + "&enemyPos=" + enemyPos + "&enemy2Pos=" + enemy2Pos + "&grid=" + gridSize);
+}
+drawGrid();
+
+</script>
+</div>
+</body>
+</html>
